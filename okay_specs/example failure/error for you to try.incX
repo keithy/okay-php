@@ -1,0 +1,7 @@
+<?php
+
+throw new ErrorException("test error");
+
+echo "Continued... (sorry Php Exceptions are not Notifications they dont come back)";
+
+return true;
