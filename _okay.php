@@ -53,6 +53,9 @@ namespace {
     ini_set('log_errors', 1);
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
+    assert_options(ASSERT_WARNING, 0);
+    ini_set('assert.exception', 1);
+
     error_reporting(E_ALL);
 
     // if (extension_loaded('xdebug')) xdebug_disable(); // orange not to your taste
@@ -131,18 +134,18 @@ namespace ok {
     }
 
     function to($message) {
-         return word("to", $message);
+        return word("to", $message);
     }
-    
+
     function should($message) {
-         return word("should", $message);
+        return word("should", $message);
     }
-   
+
     function word($word, $message) {
-        printf( okay()->indent(). "  $word $message" . BR);
+        printf(okay()->indent() . "  $word $message" . BR);
         return okay();
     }
-    
+
     /*
      * If code under test may have an endless loop, this utility comes in handy
      * ok\die_after(5);
@@ -175,6 +178,20 @@ namespace ok {
         call_user_func_array('ok\printf', $args);
     }
 
+    function asserts($on) {
+
+        if (version_compare(PHP_VERSION, '5.4.0') < 0) assert_options(ASSERT_WARNING, $on);
+        else {
+            if ($on) {
+                ini_set('assert.exception', 0);
+                assert_options(ASSERT_CALLBACK, array(okay(), 'on_assertion_failure'));
+            } else {
+                ini_set('assert.exception', 1);
+                assert_options(ASSERT_CALLBACK, "");
+            }
+        }
+    }
+
     class Okay {
 
         const VERSION = "0.8";
@@ -200,10 +217,8 @@ namespace ok {
         }
 
         function perform($dir, $method) {
-            printf("<div class='{$method}'>");
-            $file = $dir . "/{$method}.php";
-            include_if_present($file) && DEBUG() && printf("performed: $file" . BR);
-            printf("</div>");
+            $file = $dir . "/{$method}";
+            include_if_present($file) && DEBUG() && printf("<div class='{$method}'>performed: $file</div>" . BR);
         }
 
         function test($path) {
@@ -232,7 +247,7 @@ namespace ok {
             global $okaying;
 
             $this->count_files++;
-            okay($this);
+
             $this->indent(+2);
             $okaying = true;
             $result = include($path);
@@ -244,28 +259,32 @@ namespace ok {
 
         // function protect($callable, ...$args) { // php>=5.6
         function protect($callable) { // php<5.6
-            $this->previous_error_handler = set_error_handler(array($this, "error_handler"), E_WARNING);
-            $this->previous_exception_handler = set_exception_handler(array($this, "exception_handler"));
-            assert_options(ASSERT_CALLBACK, array($this, 'on_assertion_failure'));
+            if (version_compare(PHP_VERSION, '5.4.0') < 0) {
+                $this->previous_error_handler = set_error_handler(array($this, "error_handler"), E_WARNING);
+            } else assert_options(ASSERT_WARNING, 0);
+
+            // $this->previous_exception_handler = set_exception_handler(array($this, "exception_handler"));
+            asserts(true);
 
             // $result = $callable(...$args); // php>=5.6
             $result = call_user_func_array($callable, array_slice(func_get_args(), 1)); // php<5.6
 
-            restore_exception_handler();
+            asserts(false);
+            // restore_exception_handler();
             restore_error_handler();
 
             return $result;
         }
 
         function run($dir) {
-
+            okay($this);
             if (static::initializeRequested()) $this->perform('initialize');
 
             printf("<div class = 'suite'>");
 
-            $this->perform($dir, '_ok_setup');
+            $this->perform($dir, '_ok.php');
             foreach (glob("$dir/{*.inc,*/_ok.php}", GLOB_BRACE) as $path) {
-                $this->perform($dir, '_setup');
+                $this->perform($dir, '_setup.php');
 
                 if (substr($path, -3) == 'php') $this->run(dirname($path));
                 else if (is_dir($path)) {
@@ -274,10 +293,10 @@ namespace ok {
                     $this->indent(-2);
                 } else $this->test($path);
 
-                $this->perform($dir, '_teardown');
+                $this->perform($dir, '_teardown.php');
             }
 
-            $this->perform($dir, '_ok_teardown');
+            $this->perform($dir, '_ok_teardown.php');
 
             printf("</div>");
 
@@ -290,11 +309,12 @@ namespace ok {
                 if (version_compare(PHP_VERSION, '5.4.0') < 0) {
                     ++$this->count_failed_assertions;
                     $msg = substr($msg, 10, strlen($msg) - 10);
-                    printf("<em style = 'assertion-failed'>%sFAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
+                    printf("<em style = 'assertion-failed'>%s  FAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
                 }
             }
             if ($this->previous_error_handler == null) return null;
-            return $this->previous_error_handler($level, $msg, $file, $line);
+            $handler = $this->previous_error_handler;
+            return $handler($level, $msg, $file, $line);
         }
 
         function exception_handler($ex) {
@@ -309,7 +329,7 @@ namespace ok {
         function on_assertion_failure($file, $line, $code, $msg) {
             if (version_compare(PHP_VERSION, '5.4.0') >= 0) { // Handling Callback php>=5.4
                 ++$this->count_failed_assertions;
-                printf("<em style = 'assertion-failed'>%sFAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
+                printf("<em style = 'assertion-failed'>%s  FAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
             }
         }
 

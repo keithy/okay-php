@@ -15,10 +15,11 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
   
 ## Documentation:
    
-2. _okay.php is all of the code (<200 lines), both a command line, and a web test runner (wip)
+1. `_okay.php` is all of the code (<200 lines), both a command line, and a web test runner (wip)
 
-1. Adding `_ok.php` turns a directory of `*.inc` scripts/directories into a spec/test suite.
-   (Edit it manually in order to directly require the `_okay.php` file.)
+2. Adding `_ok.php` turns a directory of `*.inc` scripts/directories into a spec/test suite.
+   (Edit it manually in order to directly require the `_okay.php` file.) `_ok.php` may also be to
+   provide one-time run_setup code.
 
 3. BDD style "english" output.
     ```
@@ -36,7 +37,7 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
   
 6. Zero dependencies
 
-    Does not need a functioning composer/autoload. Will not clutter your cool lean codebase.
+    Does not need a functioning composer/autoload. Will not clutter your cool lean code-base.
     Will not frighten your package users by loading lots of stuff, just for testing/require-dev.
 
 7. Excellent basis for "Platform Tests" and White Screen of Death debugging
@@ -45,7 +46,7 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
     other bits and pieces are configured and working as expected.
  
     When faced with the PHP - W.S.O.D. and no clues, a platform test/spec suite can check for common
-    misconfiguration scenarios, can tell you what is working. 
+    misconfiguration scenarios and tell you what is working. 
  
 8. Compare Runs - see only the differences
 
@@ -96,13 +97,13 @@ Given okay spec file returns true or false
 Given okay_specs example failure assertion fail, spec returns true
   Expect assertion failure
     to look like this
-  FAILED(9): assert failed AS EXPECTED
+    FAILED(9): assert failed AS EXPECTED
   Expect specification return value
     should be ignored
 Given okay_specs example failure assertion fail; spec returns false
   Expect assertion failure
     to look like this
-  FAILED(9): assert failed AS EXPECTED
+    FAILED(9): assert failed AS EXPECTED
   Expect specification return value
     should be ignored
 Ran 6 files (12 expectations) failed 2 assertions
