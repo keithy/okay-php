@@ -80,35 +80,43 @@ Nothing fancy
 
 ```
 OKAY(0.8):/home/travis/build/keithy/okay-php
+
 Given okay spec file returns true or false
-  Expect returning true to be a pass and to look like this
+  1) Expect returning true to be a pass and to look like this
+
     Given okay_specs function copy_all_matching can prepare fixtures
-      Expect fixture directory to be empty
-      Expect copy_all files from snapshot to populate fixture directory
-      Expect delete files matching *.inc
-        should leave a *.php file 
-      Expect delete files matching *.php
-        should leave directory empty
+      2) Expect fixture directory to be empty
+      3) Expect copy_all files from snapshot to populate fixture directory
+      4) Expect delete files matching *.inc
+           should leave a *.php file 
+      5) Expect delete files matching *.php
+           should leave directory empty
+
     Given okay_specs function lookup_and_include is looking for needle
-      Expect to find needle in same directory
-      Expect to find needle via parent directory
+      6) Expect to find needle in same directory
+      7) Expect to find needle via parent directory
+
     Given okay_specs function lookup_and_include is looking for non existant file
-      Expect it to return false
+      8) Expect it to return false
+
 Given okay_specs example failure assertion fail, spec returns true
-  Expect assertion failure
-    to look like this
+  9) Expect assertion failure
+       to look like this
     FAILED(9): assert failed AS EXPECTED
-  Expect specification return value
-    should be ignored
+  10) Expect specification return value
+       should be ignored
+
 Given okay_specs example failure assertion fail; spec returns false
-  Expect assertion failure
-    to look like this
+  11) Expect assertion failure
+       to look like this
     FAILED(9): assert failed AS EXPECTED
-  Expect specification return value
-    should be ignored
+  12) Expect specification return value
+       should be ignored
 Ran 6 files (12 expectations) failed 2 assertions
 ```
 
 #### To Do
 
 HTML Web Runner - not quite ready.
+make based runner - runs tests in independent php processes!
+
