@@ -363,7 +363,7 @@ namespace ok {
         {
             if (version_compare(PHP_VERSION, '5.4.0') >= 0) { // Handling Callback php>=5.4
                 ++$this->count_failed_assertions;
-                printf("<em style = 'assertion-failed'>%sFAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
+                printf("<em style = 'assertion-failed'>%2d} %sFAILED(%s):</em> %s" . BR, $this->count_expectations, $this->indent(), $line, $msg);
             }
         }
 

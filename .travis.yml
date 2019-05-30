@@ -1,5 +1,5 @@
 language: php
-php: [nightly,7.4,7.3,7.2,7.1,5.6,5.5,5.4]
+php: [nightly,7.4,7.3,7.2,7.1,5.6]
 script: php "_okay.php" | diff -bwB ".expected${VERS}" -
 matrix:
 #  fast_finish: true
@@ -7,5 +7,9 @@ matrix:
     - php: 5.3
       dist: precise
       env: VERS=5.3
+    - php: 5.4
+      dist: trusty
+    - php: 5.5
+      dist: trusty
   allow_failures:
   - php: 7.4
