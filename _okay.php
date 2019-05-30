@@ -134,15 +134,16 @@ namespace ok {
     }
 
     function to($message) {
-        return word("to", $message);
+        return _("to", $message);
     }
 
     function should($message) {
-        return word("should", $message);
+        return _("should", $message);
     }
 
-    function word($word, $message) {
-        printf(okay()->indent() . "  $word $message" . BR);
+    function _() {
+        $msg = implode(' ',func_get_args());
+        printf(okay()->indent() . "  {$msg}" . BR);
         return okay();
     }
 
@@ -180,8 +181,9 @@ namespace ok {
 
     function asserts($on) {
 
-        if (version_compare(PHP_VERSION, '5.4.0') < 0) assert_options(ASSERT_WARNING, $on);
-        else {
+        if (version_compare(PHP_VERSION, '5.4.0') < 0) {
+            assert_options(ASSERT_WARNING, $on);
+        } else {
             if ($on) {
                 ini_set('assert.exception', 0);
                 assert_options(ASSERT_CALLBACK, array(okay(), 'on_assertion_failure'));
