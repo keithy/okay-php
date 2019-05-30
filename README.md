@@ -15,7 +15,7 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
   
 ## Documentation:
    
-1. `_okay.php` is all of the code (<200 lines), both a command line, and a web test runner (wip)
+1. `_okay.php` is all of the code (<300 lines), both a command line, and a web test runner (wip)
 
 2. Adding `_ok.php` turns a directory of `*.inc` scripts/directories into a spec/test suite.
    (Edit it manually in order to directly require the `_okay.php` file.) `_ok.php` may also be to
@@ -82,36 +82,36 @@ Nothing fancy
 OKAY(0.8):/home/travis/build/keithy/okay-php
 
 Given okay spec file returns true or false
-  1) Expect returning true to be a pass and to look like this
+ 1) Expect returning true to be a pass and to look like this
 
-    Given okay_specs function copy_all_matching can prepare fixtures
-      2) Expect fixture directory to be empty
-      3) Expect copy_all files from snapshot to populate fixture directory
-      4) Expect delete files matching *.inc
-           should leave a *.php file 
-      5) Expect delete files matching *.php
-           should leave directory empty
+Given okay_specs function copy_all_matching can prepare fixtures
+ 2) Expect fixture directory to be empty
+ 3) Expect copy_all files from snapshot to populate fixture directory
+ 4) Expect delete files matching *.inc
+      should leave a *.php file 
+ 5) Expect delete files matching *.php
+      should leave directory empty
 
-    Given okay_specs function lookup_and_include is looking for needle
-      6) Expect to find needle in same directory
-      7) Expect to find needle via parent directory
+Given okay_specs function lookup_and_include is looking for needle
+ 6) Expect to find needle in same directory
+ 7) Expect to find needle via parent directory
 
-    Given okay_specs function lookup_and_include is looking for non existant file
-      8) Expect it to return false
+Given okay_specs function lookup_and_include is looking for non existent file
+ 8) Expect it to return false
 
 Given okay_specs example failure assertion fail, spec returns true
-  9) Expect assertion failure
-       to look like this
-    FAILED(9): assert failed AS EXPECTED
-  10) Expect specification return value
-       should be ignored
+ 9) Expect assertion failure
+      to look like this
+FAILED(9): assert failed AS EXPECTED
+10) Expect specification return value
+      should be ignored
 
 Given okay_specs example failure assertion fail; spec returns false
-  11) Expect assertion failure
-       to look like this
-    FAILED(9): assert failed AS EXPECTED
-  12) Expect specification return value
-       should be ignored
+11) Expect assertion failure
+      to look like this
+FAILED(9): assert failed AS EXPECTED
+12) Expect specification return value
+      should be ignored
 Ran 6 files (12 expectations) failed 2 assertions
 ```
 

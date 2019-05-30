@@ -68,7 +68,7 @@ namespace {
         if (!defined('BR')) define('BR', PHP_EOL);
         if (!defined('KOUTPUT')) define('KOUTPUT', 'text/plain');
     } else { // web runner
-        if (strpos($_SERVER['DEV_ALLOWED'], ".okaying.") == false) {
+        if (strpos($_SERVER['DEV_ALLOWED'], ".okay.") == false) {
             echo "Testing not authorised";
             exit;
         }
@@ -76,6 +76,7 @@ namespace {
         header("Content-Type: ");
         if (!defined('KOUTPUT')) define('KOUTPUT', 'text/plain');
     }
+    
     function ok($format)
     { // php<5.6
         $args = func_get_args(); // php<5.6
@@ -144,14 +145,14 @@ namespace ok {
     function _()
     {
         $msg = implode(' ', func_get_args());
-        printf(okay()->indent() . "     {$msg}" . BR);
+        printf(okay()->indent() . "      {$msg}" . BR);
         return okay();
     }
 
     function __()
     {
         $msg = implode(' ', func_get_args());
-        printf(okay()->indent() . "%d) " . $msg . BR, ++okay()->count_expectations);
+        printf( okay()->indent() . "%2d) " . $msg . BR, ++okay()->count_expectations);
         return okay();
     }
     
@@ -276,11 +277,11 @@ namespace ok {
 
             $this->count_files++;
 
-            $this->indent(+2);
+            //$this->indent(+2);
             $okaying = true;
             $result = include($path);
             $okaying = false;
-            $this->indent(-2);
+            //$this->indent(-2);
 
             return $result;
         }
@@ -318,9 +319,9 @@ namespace ok {
 
                 if (substr($path, -3) == 'php') $this->run(dirname($path));
                 else if (is_dir($path)) {
-                    $this->indent(+2);
+                    //$this->indent(+2);
                     $this->run($path);
-                    $this->indent(-2);
+                    //$this->indent(-2);
                 } else $this->test($path);
 
                 $this->perform($dir, '_teardown.php');
@@ -340,7 +341,7 @@ namespace ok {
                 if (version_compare(PHP_VERSION, '5.4.0') < 0) {
                     ++$this->count_failed_assertions;
                     $msg = substr($msg, 10, strlen($msg) - 10);
-                    printf("<em style = 'assertion-failed'>%s  FAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
+                    printf("<em style = 'assertion-failed'>%s   FAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
                 }
             }
             if ($this->previous_error_handler == null) return null;
@@ -362,7 +363,7 @@ namespace ok {
         {
             if (version_compare(PHP_VERSION, '5.4.0') >= 0) { // Handling Callback php>=5.4
                 ++$this->count_failed_assertions;
-                printf("<em style = 'assertion-failed'>%s  FAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
+                printf("<em style = 'assertion-failed'>%sFAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
             }
         }
 
@@ -383,6 +384,7 @@ namespace ok {
     $count_files = $okay->count_files;
     $count_expectations = $okay->count_expectations;
     $count_failed_assertions = $okay->count_failed_assertions;
+    
     $failedMsg = ($count_failed_assertions > 0) ? "failed {$count_failed_assertions} assertions" : "OK";
     if (isCLI())
             printf("Ran %d files (%d expectations) %s" . BR, $count_files, $count_expectations, $failedMsg);
