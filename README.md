@@ -1,5 +1,5 @@
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
-[![Build Status](https://travis-ci.org/keithy/okay-php.svg?branch=master)](https://travis-ci.org/keithy/okay-php)
+[![Build Status](https://travis-ci.com/keithy/okay-php.svg?branch=master)](https://travis-ci.com/keithy/okay-php)
 [![GitHub issues](https://img.shields.io/github/issues/keithy/okay-php.svg)](https://github.com/keithy/okay-php/issues)
 [![Latest Version](https://img.shields.io/github/release/keithy/okay-php.svg)](https://github.com/keithy/okay-php/releases)
 [![PHP from Travis config](https://img.shields.io/travis/php-v/keithy/okay-php.svg)](https://travis-ci.org/keithy/okay-php)
@@ -66,11 +66,11 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
  ```
  language: php
  php: [5.6,7.1]
- script: php _okay.php | diff .expected -
+ script: php okay/_okay.php
  ```
 ## Usage
 
-1. Copy the `_okay.php` file to somewhere within your project, or to the root of your specs/tests folder.
+1. Copy the `_okay.php` file to somewhere within your project, or to the root of your specs/tests/okay folder.
 
 2. Copy the `_ok.php` file to the root of any other specs/tests folder within your project.
    (edit it so that it can find _okay.php)
