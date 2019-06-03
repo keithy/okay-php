@@ -4,7 +4,7 @@
 [![Latest Version](https://img.shields.io/github/release/keithy/okay-php.svg)](https://github.com/keithy/okay-php/releases)
 [![PHP from Travis config](https://img.shields.io/travis/php-v/keithy/okay-php.svg)](https://travis-ci.org/keithy/okay-php)
 
-# OKAY 0.8 -  Keeping It Simple Specifications for PHP
+# OKAY 0.9 -  Keeping It Simple Specifications for PHP
  
 Totally the simplest BDD/TDD framework,... in the world!
  
@@ -18,15 +18,17 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
 1. `_okay.php` is all of the code (<300 lines), both a command line, and a web test runner (wip)
 
 2. Adding `_ok.php` turns a directory of `*.inc` scripts/directories into a spec/test suite.
-   (Edit it manually in order to directly require the `_okay.php` file.) `_ok.php` may also be to
-   provide one-time run_setup code.
+   (Edit it manually in order to directly require the `_okay.php` file.) 
+
+ `_ok.php` also provides one-time run_setup code for specs/tests/okays in that directory.
 
 3. BDD style "english" output.
     ```
-    ok\expect("it to be good");
+    EXPECT("it to be good");
     ``` 
 4. Uses PHP built in `assert`
     ```
+    _("it's going to be good");
     assert( $it == "good" , "'$it' wasn't good" );
     ```
 
@@ -37,7 +39,7 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
   
 6. Zero dependencies
 
-    Does not need a functioning composer/autoload. Will not clutter your cool lean code-base.
+    Does not need a functioning composer/autoload. Will not clutter your cool, lean code-base.
     Will not frighten your package users by loading lots of stuff, just for testing/require-dev.
 
 7. Excellent basis for "Platform Tests" and White Screen of Death debugging
@@ -66,7 +68,7 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
  ```
  language: php
  php: [5.6,7.1]
- script: php okay/_okay.php
+ script: php okay/_okay.php -I
  ```
 ## Usage
 
@@ -102,14 +104,14 @@ Given okay_specs function lookup_and_include is looking for non existent file
 Given okay_specs example failure assertion fail, spec returns true
  9) Expect assertion failure
       to look like this
-FAILED(9): assert failed AS EXPECTED
+FAILED(14): assert failed AS EXPECTED
 10) Expect specification return value
       should be ignored
 
 Given okay_specs example failure assertion fail; spec returns false
 11) Expect assertion failure
       to look like this
-FAILED(9): assert failed AS EXPECTED
+FAILED(14): assert failed AS EXPECTED
 12) Expect specification return value
       should be ignored
 Ran 6 files (12 expectations) failed 2 assertions
@@ -117,6 +119,6 @@ Ran 6 files (12 expectations) failed 2 assertions
 
 #### To Do
 
-HTML Web Runner - not quite ready.
-make based runner - runs tests in independent php processes!
+Beautify the runners.
+Make based runner - runs tests in independent php processes!
 

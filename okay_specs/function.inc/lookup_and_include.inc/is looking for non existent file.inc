@@ -1,7 +1,10 @@
 <?php
 
-$start = __DIR__ . '/fixture/A/B/C';
+namespace ok {
 
-ok\expect("it to return false");
+    EXPECT("it to return false");
 
-assert( false == ok\lookup_and_include('no_way_this_exists', $start) );
+    $start = __DIR__ . '/fixture/A/B/C';
+
+    assert(false == lookup_and_include('no_way_this_exists', $start));
+}

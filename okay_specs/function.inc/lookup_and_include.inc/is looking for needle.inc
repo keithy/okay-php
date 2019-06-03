@@ -1,13 +1,17 @@
 <?php
 
-$start = __DIR__ . '/fixture/A/B/C';
+namespace ok {
 
-ok\expect("to find needle in same directory");
+    EXPECT("to find needle in same directory");
 
+    $start = __DIR__ . '/fixture/A/B/C';
 
-assert( ok\lookup_and_include('needleC', $start) == "C");
+    assert(lookup_and_include('needleC', $start) == "C");
+}
 
-ok\expect("to find needle via parent directory");
+namespace ok {
 
-assert( ok\lookup_and_include('needleB', $start) == "B");
- 
+    EXPECT("to find needle via parent directory");
+
+    assert(lookup_and_include('needleB', $start) == "B");
+}

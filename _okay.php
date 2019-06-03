@@ -2,7 +2,7 @@
 
 # 
 /*
-  # OKAY 0.8 -  Keeping It Simple Specifications for PHP!
+  # OKAY 0.9 -  Keeping It Simple Specifications for PHP!
 
   Totally the simplest BDD/TDD framework,... in the world!
 
@@ -20,7 +20,7 @@
 
   3. BDD style "english" output.
   ```
-  ok\expect("it to be good");
+  EXPECT("it to be good");
   ```
   4. Uses PHP built in `assert`
   ```
@@ -173,25 +173,21 @@ namespace ok {
         global $OKAY_SUITE_TOP;
 
         $given = substr($path, strlen($OKAY_SUITE_TOP));
-        $given = str_replace(array('.inc', '.php', '/', '/_'), array('', '', ' ', ' '), $given);
+        $given = preg_replace(array('|/\d+\.|', '|\.inc|', '|\.php|', '|/|', '|/_|', ), array(' ', '', ' ', ' '), $given);
         printf(BR . "<div class='test'><em>%sGiven{$given}</em><br><div class = 'output'>" . BR, okay()->indent());
     }
 
     // $okay = ok\expect("expectation...")
-    function expect($message)
+    function EXPECT($message)
     {
         return __("Expect", $message);
     }
-
-    function to($message)
-    {
-        return _("to", $message);
-    }
-
-    function should($message)
+ 
+    function Should($message)
     {
         return _("should", $message);
     }
+    
     /*
      * If code under test may have an endless loop, this utility comes in handy
      * ok\die_after(5);
@@ -236,7 +232,7 @@ namespace ok {
 
     class Okay
     {
-        const VERSION = "0.8";
+        const VERSION = "0.9";
 
         public $dir;
         public $count_files;

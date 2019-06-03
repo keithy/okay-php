@@ -1,33 +1,44 @@
 <?php
 
-ok\expect("fixture directory to be empty");
+namespace ok {
+    EXPECT("fixture directory to be empty");
 
-assert(!file_exists(__DIR__ . '/fixture_to/dummy.php'));
-assert(!file_exists(__DIR__ . '/fixture_to/dummy.inc'));
-assert(!file_exists(__DIR__ . '/fixture_to/empty.inc'));
+    assert(!file_exists(__DIR__ . '/fixture_to/dummy.php'));
+    assert(!file_exists(__DIR__ . '/fixture_to/dummy.inc'));
+    assert(!file_exists(__DIR__ . '/fixture_to/empty.inc'));
+}
 
-ok\expect("copy_all files from snapshot to populate fixture directory");
+namespace ok {
 
-ok\copy_all(__DIR__ . '/fixture_from', __DIR__ . '/fixture_to');
+    EXPECT("copy_all files from snapshot to populate fixture directory");
 
-assert(file_exists(__DIR__ . '/fixture_to/dummy.inc'));
-assert(file_exists(__DIR__ . '/fixture_to/empty.inc'));
-assert(file_exists(__DIR__ . '/fixture_to/dummy.php'));
+    copy_all(__DIR__ . '/fixture_from', __DIR__ . '/fixture_to');
 
-ok\expect("delete files matching *.inc");
-        
-ok\delete_all_matching(__DIR__, '/fixture_to/*.inc');
+    assert(file_exists(__DIR__ . '/fixture_to/dummy.inc'));
+    assert(file_exists(__DIR__ . '/fixture_to/empty.inc'));
+    assert(file_exists(__DIR__ . '/fixture_to/dummy.php'));
+}
 
-ok\should("leave a *.php file ");
+namespace ok {
 
-assert(!file_exists(__DIR__ . '/fixture_to/dummy.inc'));
-assert(!file_exists(__DIR__ . '/fixture_to/empty.inc'));
-assert(file_exists(__DIR__ . '/fixture_to/dummy.php'));
+    EXPECT("delete files matching *.inc");
 
-ok\expect("delete files matching *.php");
+    delete_all_matching(__DIR__, '/fixture_to/*.inc');
 
-ok\delete_all_matching(__DIR__ , '/fixture_to/*.php');
+    _("should leave a *.php file ");
 
-ok\should("leave directory empty");
+    assert(!file_exists(__DIR__ . '/fixture_to/dummy.inc'));
+    assert(!file_exists(__DIR__ . '/fixture_to/empty.inc'));
+    assert(file_exists(__DIR__ . '/fixture_to/dummy.php'));
+}
 
-assert(!file_exists(__DIR__ . '/fixture_to/dummy.php'));
+namespace ok {
+    
+    EXPECT("delete files matching *.php");
+
+    delete_all_matching(__DIR__, '/fixture_to/*.php');
+
+    _("should leave directory empty");
+
+    assert(!file_exists(__DIR__ . '/fixture_to/dummy.php'));
+}

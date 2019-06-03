@@ -1,23 +1,25 @@
 <?php
 
-ok\expect("assertion failure");
+namespace ok {
 
-ok\to("look like this");
+    EXPECT("assertion failure");
 
-if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+    _("to look like this");
 
-    assert(false, "assert failed AS EXPECTED");
+    if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
 
-    
-} else {
-    
-    assert(false /* failed AS EXPECTED */); // php<=5.3
+        assert(false, "assert failed AS EXPECTED");
+    } else {
 
-    
+        assert(false /* failed AS EXPECTED */); // php<=5.3
+    }
 }
 
-ok\expect("specification return value");
+namespace ok {
 
-ok\should("be ignored");
+    EXPECT("specification return value");
 
-return true;
+    _("should be ignored");
+
+    return true;
+}  
