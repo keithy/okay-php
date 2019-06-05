@@ -7,7 +7,11 @@ global $OKAY_SUITE;
 $OKAY_SUITE = __DIR__;
 
 # first time
-if(true !== require_once(__DIR__.'/../../_okay.php')) return;
+if (!defined('__OKAY__')) {
+    require(__DIR__ . '/../_okay.php');
+    return;
+}
+
 # second time
 
 # Initialisation code - one-time setup for this directory
