@@ -5,56 +5,15 @@
 
   Totally the simplest BDD/TDD framework,... in the world!
 
-  Design based on the original SUnit by Kent Beck
-
-  A result of another Cunningham-Beck innovation:
-  http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
-
-  ## Documentation:
-
-  1. Adding `_ok.php` turns a directory of `*.inc` scripts/directories into a spec/test suite.
-  edit it manually in order to directly require the `_okay.php` file.
-
-  2. _okay.php is both a command line, and a web test runner (wip)
-
-  3. BDD style "english" output.
-  ```
-  EXPECT("it to be good");
-  ```
-  4. Uses PHP built in `assert`
-  ```
-  assert( $it == "good" , "'$it' wasn't good" );
-  ```
-
-  5. Use throughout your codebase, deployment optional
-
-  Great for adding specs/tests to a file-based "legacy" PHP system.
-  (adjust your deployment to ignore/delete `_*` files, and it's gone.)
-
-  6. Zero dependencies
-
-  Does not need a functioning composer/autoload. Will not clutter your lean cool code.
-  Will not frighten your package users by loading lots of stuff, just for testing/require-dev.
-
-  7. Excellent basis for "Platform Tests" and White Screen of Death debugging
-
-  Platform-tests should run to verify that the deployment platform, and php itself is
-  is configured and working as expected.
-
-  When faced with the PHP - W.S.O.D. and no clues, a platform test/spec suite can check for common
-  misconfiguration scenarios, can tell you what is working.
-
-  #### TODO HTML Web Runner - not ready
+  https://github.com/keithy/okay-php
  */
 
-namespace {
-    $OKAY_VERSION = '0.9.6';
+namespace { // customize per-installation
+    $OKAY_VERSION = '0.9.7';
     // Take your pick
     ini_set('log_errors', 1);
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
-    assert_options(ASSERT_WARNING, 0);
-    ini_set('assert.exception', 1);
 
     error_reporting(E_ALL);
 
@@ -67,6 +26,12 @@ namespace {
      *  and signified via the environment variable
      * You may have to adapt this for your security environment.
      */
+}
+
+namespace {
+
+    assert_options(ASSERT_WARNING, 0);
+    ini_set('assert.exception', 1);
 
     if (ok\isCLI()) { // cli runner
         if (!defined('BR')) define('BR', PHP_EOL);
@@ -78,7 +43,6 @@ namespace {
         }
 
         // respond in plaintext for now.
-
         if (!defined('OKAY_OUTPUT')) define('OKAY_OUTPUT', 'text/plain');
         if (!defined('BR')) define('BR', PHP_EOL);
         // if (!defined('BR')) define('BR', '<BR>');
@@ -86,7 +50,8 @@ namespace {
         header("Content-Type: " . OKAY_OUTPUT);
         ini_set('html_errors', 0);
 
-        if (isset($_GET['ok'])) $OKAY_SUITE = __PROJECT__ . '/' . $_GET['ok'];
+        if (isset($_GET['ok'])) $OKAY_SUITE = realpath(__PROJECT__ . '/' . $_GET['ok']);
+        if (0 !== strpos($OKAY_SUITE, __PROJECT__)) die('Invalid Path');
     }
 
     function ok($format)
@@ -376,8 +341,8 @@ namespace ok {
 
     if (!isset($OKAY_SUITE)) $OKAY_SUITE = __DIR__;
     if (!defined('__OKAY__')) define('__OKAY__', __FILE__);
- 
-     
+
+
     $title = "OKAY($OKAY_VERSION):" . $OKAY_SUITE;
 
     if (isCLI()) printf("$title" . BR);

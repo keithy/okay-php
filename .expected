@@ -1,5 +1,3 @@
-OKAY(0.9.6):/home/travis/build/keithy/okay-php
-
 Given okay spec file returns true or false
  1) Expect returning true to be a pass and to look like this
 

@@ -1,0 +1,26 @@
+{
+  "name": "okay/okay",
+  "type": "library",
+  "description": "Ultra Simple Specifications for PHP",
+  "keywords": ["testing", "unit-tests", "platform-tests", "platform-specs", "specs", "BDD", "TDD"],
+  "homepage": "https://github.com/keithy/okay-php",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Keithy",
+      "email": "keithy@consultant.com",
+      "role": "Developer"
+    }
+  ],
+
+  "require": {
+  },
+  "require-dev": {
+  },
+  "autoload": {
+  },
+  "autoload-dev": {
+  },
+  "scripts": {
+  }
+}
