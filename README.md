@@ -56,13 +56,13 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
     # generate expected output
     php _okay.php | tee  .out
     # change something
-    php _okay.php | diff .out -
+    php _okay.php | diff -U5 .out -
     ```
 
 9. Go Continuous - genius!
 
     ```
-    watch -n3  'php _okay.php | diff .out -' 
+    watch -n3  'php _okay.php | diff -U5 .out -' 
     ```
 10. Works great with travis.ci in github
  ```

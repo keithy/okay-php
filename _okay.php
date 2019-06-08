@@ -138,7 +138,7 @@ namespace ok {
     {
         global $OKAY_SUITE;
         $given = substr($path, strlen($OKAY_SUITE));
-        $given = preg_replace(array('|/\d+\.|', '|\.inc|', '|\.php|', '|/|', '|/_|',), array(' ', '', ' ', ' '), $given);
+        $given = preg_replace(array('|/\d+\.|', '|/|', '|/_|', '|\.inc|', '|\.php|', '|\.ok|'), array(' ',' ', ' ', '','','' ), $given);
         printf(BR . "<div class='test'><em>%sGiven{$given}</em><br><div class = 'output'>" . BR, okay()->indent());
     }
 
@@ -196,6 +196,8 @@ namespace ok {
 
     class Okay
     {
+        const glob = '/{*.inc,*.ok,*/*.ok,*/_ok.php}';
+        
         public $dir;
         public $count_files;
         public $count_expectations;
@@ -285,7 +287,7 @@ namespace ok {
             printf("<div class = 'suite'>");
 
             $this->perform($dir, '_ok.php');
-            foreach (glob("$dir/{*.inc,*/_ok.php}", GLOB_BRACE) as $path) {
+            foreach (glob( $dir. Okay::glob  , GLOB_BRACE) as $path) {
                 $this->perform($dir, '_setup.php');
 
                 if (substr($path, -3) == 'php') $this->run(dirname($path));
