@@ -17,9 +17,8 @@ namespace ok {
 
 namespace ok {
 
-    EXPECT("specification return value");
+    EXPECT("spec file return value");
 
     _("should be ignored");
-
-    return true;
+ 
 }  

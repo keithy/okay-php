@@ -1,32 +1,29 @@
-Given okay spec file returns true or false
- 1) Expect returning true to be a pass and to look like this
-
-Given function copy_all_matching can prepare fixtures
- 2) Expect fixture directory to be empty
- 3) Expect copy_all files from snapshot to populate fixture directory
- 4) Expect delete files matching *.inc
+Given okay provides function copy_all_matching to prepare fixtures
+ 1) Expect fixture directory to be empty
+ 2) Expect copy_all files from snapshot to populate fixture directory
+ 3) Expect delete files matching *.inc
       should leave a *.php file 
- 5) Expect delete files matching *.php
+ 4) Expect delete files matching *.php
       should leave directory empty
 
-Given function lookup_and_include is looking for needle
- 6) Expect to find needle in same directory
- 7) Expect to find needle via parent directory
+Given okay provides function lookup_and_include to look for needle
+ 5) Expect to find needle in same directory
+ 6) Expect to find needle via parent directory
 
-Given function lookup_and_include is looking for non existent file
- 8) Expect it to return false
+Given okay provides function lookup_and_include when looking for non existent file
+ 7) Expect it to return false
 
-Given assertion fail, spec returns true
- 9) Expect assertion failure
+Given okay provides assertions when they fail
+ 8) Expect assertion failure
       to look like this
- 9} FAILED(11): assert failed AS EXPECTED
-10) Expect specification return value
+ 8} FAILED(11): assert failed AS EXPECTED
+ 9) Expect spec file return value
       should be ignored
 
-Given assertion fail; spec returns false
-11) Expect assertion failure
+Given okay provides assertions when they pass
+10) Expect assertion failure
       to look like this
-11} FAILED(11): assert failed AS EXPECTED
-12) Expect specification return value
+10} FAILED(11): assert failed AS EXPECTED
+11) Expect spec file return value
       should be ignored
-Ran 6 files (12 expectations) failed 2 assertions
+Ran 5 files (11 expectations) failed 2 assertions

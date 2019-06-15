@@ -1,47 +1,70 @@
 <?php
 
+namespace ok;
+
 /*
-  # OKAY -  Keeping It Simple Specifications for PHP!
-
-  Totally the simplest BDD/TDD framework,... in the world!
-
-  https://github.com/keithy/okay-php
+ *   # OKAY -  Keeping It Simple Specifications for PHP!
+ * 
+ * Totally the simplest BDD/TDD framework,... in the world!
+ * 
+ * https://github.com/keithy/okay-php
+ * 
  */
 
-namespace { // customize per-installation
-    $OKAY_VERSION = '0.9.8';
-    // Take your pick
+
+// Update minor version number on every commit
+$OKAY_VERSION = '0.9.15';
+
+// The enclosure of the code within the 'else' clause of this conditional ensures
+// that we do not get function re-definition errors. (Dont be tempted to remove it.)
+if (defined('__OKAY__')) return false;
+else {
+
+    define('__OKAY__', __FILE__);
+
+    if (isset($OKAY_SUITE)) $OKAY_SUITE = realpath($OKAY_SUITE);
+    else { // find the calling file's directory
+        $backtrace = debug_backtrace();
+        $OKAY_SUITE = (empty($backtrace)) ? __DIR__ : dirname($backtrace[0]['file']);
+    }
+
+    // Magic constant to point to the project root. Assumes we are in /vendor/okay/okay
+    if (!defined('__PROJECT__')) define("__PROJECT__", dirname(dirname(dirname(__DIR__))));
+
+    /*
+     * For web runner security we defer to an externally supplied file - please provide your own!
+     */
+
+    if (php_sapi_name() !== 'cli' && !include($_SERVER['DOCUMENT_ROOT'] . '/../config/gateway_okay.inc'))
+            die("HERE");
+
+    // Defaults
     ini_set('log_errors', 1);
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
-
     error_reporting(E_ALL);
 
     // if (extension_loaded('xdebug')) xdebug_disable(); // orange not to your taste
-    // define our own magic constants to point to the project and site roots.
- 
-    if (!defined('__PROJECT__')) define("__PROJECT__", dirname(dirname(dirname(__DIR__))));
- 
-    /* Secure for a specific IP address/range configured in Apache <site>.conf
-     *  and signified via the environment variable
-     * You may have to adapt this for your security environment.
-     */
-}
 
-namespace {
+    function include_if_present($file)
+    {
+        if (file_exists($file)) {
+            return include($file);
+        }
+        return false;
+    }
+    // Local user can override settings
+    include_if_present(__PROJECT__ . '/config/okay.inc');
 
+    // But not these settings
     assert_options(ASSERT_WARNING, 0);
     ini_set('assert.exception', 1);
 
-    if (ok\isCLI()) { // cli runner
+    // SetUp the Runners output
+    if (php_sapi_name() == 'cli') { // cli runner
         if (!defined('BR')) define('BR', PHP_EOL);
         if (!defined('OKAY_OUTPUT')) define('OKAY_OUTPUT', 'text/plain');
     } else { // web runner
-        if (strpos($_SERVER['DEV_ALLOWED'], ".kisting.") == false) {
-            echo "Testing not authorised";
-            exit;
-        }
-
         // respond in plaintext for now.
         if (!defined('OKAY_OUTPUT')) define('OKAY_OUTPUT', 'text/plain');
         if (!defined('BR')) define('BR', PHP_EOL);
@@ -54,29 +77,10 @@ namespace {
         if (0 !== strpos($OKAY_SUITE, __PROJECT__)) die('Invalid Path');
     }
 
-    function ok($format)
-    { // php<5.6
-        $args = func_get_args(); // php<5.6
-        $args[0] = ok\okay()->indent() . "     " . $format . BR;
-        call_user_func_array('ok\printf', $args);
-    }
-}
-
-namespace ok {
-
     // ok\DEBUG() && ok\printf("Debug only Output".BR);
     function DEBUG()
     {
         return in_array('-D', $_SERVER['argv']) || filter_input(INPUT_GET, 'debug', FILTER_VALIDATE_BOOLEAN);
-    }
-
-    function include_if_present($file)
-    {
-        if (file_exists($file)) {
-            include($file);
-            return true;
-        }
-        return false;
     }
 
     // useful for wiping out file fixtures in a directory
@@ -118,7 +122,7 @@ namespace ok {
         return $okay;
     }
 
-// vocabulary
+    // vocabulary
 
     function _()
     {
@@ -165,18 +169,18 @@ namespace ok {
         if ($over < $the_edge++) die;
     }
 
-    function isCLI()
+    function isPlain()
     {
-        return (php_sapi_name() == 'cli' || (defined('OKAY_OUTPUT') && OKAY_OUTPUT == 'text/plain'));
+        return OKAY_OUTPUT == 'text/plain';
     }
 
     // function printf($format, ...$args) { // php>=5.6
-    // \printf(isCLI() ? strip_tags($format) : $format, ... $args); }
+    // \printf(isPlain() ? strip_tags($format) : $format, ... $args); }
 
     function printf($format)
     { // php<5.6
         $args = func_get_args();
-        $args[0] = isCLI() ? strip_tags($format) : $format;
+        $args[0] = isPlain() ? strip_tags($format) : $format;
         call_user_func_array('\printf', $args);
     }
 
@@ -239,7 +243,7 @@ namespace ok {
 
     class Okay
     {
-        const glob = '/{*.inc,*.ok,*/*.ok,*/_ok.php}';
+        const glob = '/{*.inc,*.ok,*/_ok.php}';
 
         public $dir;
         public $count_files;
@@ -264,10 +268,10 @@ namespace ok {
         {
             $file = $dir . "/{$method}";
             if (file_exists($file)) {
+                DEBUG() && printf("<div class='{$method}'>performing: $file</div>" . BR);
+                //});
                 //$this->protect(function() use( $file, $method ) {
                 include($file);
-                DEBUG() && printf("<div class='{$method}'>performed: $file</div>" . BR);
-                //});
             }
         }
 
@@ -316,7 +320,7 @@ namespace ok {
                 $this->previous_error_handler = set_error_handler(array($this, "error_handler"), E_WARNING);
             } else assert_options(ASSERT_WARNING, 0);
 
-            $this->previous_error_handler = set_error_handler(array($this, "error_handler"), E_WARNING);
+            //$this->previous_error_handler = set_error_handler(array($this, "error_handler"), E_WARNING);
             $this->previous_exception_handler = set_exception_handler(array($this, "exception_handler"));
             asserts(true);
 
@@ -341,6 +345,7 @@ namespace ok {
 
             $this->perform($dir, '_ok.php');
             foreach (glob($dir . Okay::glob, GLOB_BRACE) as $path) {
+
                 $this->perform($dir, '_setup.php');
 
                 if (substr($path, -3) == 'php') $this->run(dirname($path));
@@ -370,9 +375,9 @@ namespace ok {
                     printf("<em style = 'assertion-failed'>%s   FAILED(%s):</em> %s" . BR, $this->indent(), $line, $msg);
                 }
             }
-            if ($this->previous_error_handler == null) return null;
-            $handler = $this->previous_error_handler;
-            return $handler($level, $msg, $file, $line);
+
+            if ($this->previous_error_handler)
+                    call_user_func($this->previous_error_handler, $level, $msg, $file, $line);
         }
 
         function exception_handler($ex)
@@ -401,13 +406,11 @@ namespace ok {
         }
     }
 
-    if (!isset($OKAY_SUITE)) $OKAY_SUITE = __DIR__;
-    if (!defined('__OKAY__')) define('__OKAY__', __FILE__);
-
+    // Output
 
     $title = "OKAY($OKAY_VERSION):" . $OKAY_SUITE;
 
-    if (isCLI()) printf("$title" . BR);
+    if (isPlain()) printf("$title" . BR);
     else \ok\lookup_and_include('header_okay', $OKAY_SUITE);
 
     $okay = new Okay();
@@ -418,7 +421,10 @@ namespace ok {
     $count_failed_assertions = $okay->count_failed_assertions;
 
     $failedMsg = ($count_failed_assertions > 0) ? "failed {$count_failed_assertions} assertions" : "OK";
-    if (isCLI())
+
+    if (isPlain())
             printf("Ran %d files (%d expectations) %s" . BR, $count_files, $count_expectations, $failedMsg);
     else \ok\lookup_and_include('footer_okay', $OKAY_SUITE);
-}    
+
+    return true;
+}
