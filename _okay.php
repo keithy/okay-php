@@ -9,7 +9,7 @@
  */
 
 namespace { // customize per-installation
-    $OKAY_VERSION = '0.9.7';
+    $OKAY_VERSION = '0.9.8';
     // Take your pick
     ini_set('log_errors', 1);
     ini_set('display_errors', 1);
@@ -19,9 +19,9 @@ namespace { // customize per-installation
 
     // if (extension_loaded('xdebug')) xdebug_disable(); // orange not to your taste
     // define our own magic constants to point to the project and site roots.
-    if (!defined('__PROJECT__')) define("__PROJECT__", dirname(dirname(__DIR__)));
-    if (!defined('__SITE__')) define("__SITE__", __PROJECT__ . "/public");
-
+ 
+    if (!defined('__PROJECT__')) define("__PROJECT__", dirname(dirname(dirname(__DIR__))));
+ 
     /* Secure for a specific IP address/range configured in Apache <site>.conf
      *  and signified via the environment variable
      * You may have to adapt this for your security environment.
@@ -138,14 +138,16 @@ namespace ok {
     {
         global $OKAY_SUITE;
         $given = substr($path, strlen($OKAY_SUITE));
-        $given = preg_replace(array('|/\d+\.|', '|/|', '|/_|', '|\.inc|', '|\.php|', '|\.ok|'), array(' ',' ', ' ', '','','' ), $given);
+        $given = preg_replace(array('|/\d+\.|', '|/|', '|/_|', '|\.inc|', '|\.php|', '|\.ok|'), array(' ', ' ', ' ', '', '', ''), $given);
         printf(BR . "<div class='test'><em>%sGiven{$given}</em><br><div class = 'output'>" . BR, okay()->indent());
     }
 
     // $okay = ok\expect("expectation...")
-    function EXPECT($message)
+    function EXPECT()
     {
-        return __("Expect", $message);
+        $args = func_get_args();
+        array_unshift($args, "Expect");
+        return call_user_func_array("ok\__", $args);
     }
 
     function Should($message)
@@ -194,10 +196,51 @@ namespace ok {
         }
     }
 
+    // HT https://stackoverflow.com/users/418819/steve
+    function getExceptionTraceAsString($exception, $excludeN)
+    {
+        $rtn = "";
+        $count = 0;
+        $frames = $exception->getTrace();
+        array_splice($frames, count($frames) - $excludeN, $excludeN);
+        foreach ($frames as $frame) {
+            $args = "";
+            if (isset($frame['args'])) {
+                $args = array();
+                foreach ($frame['args'] as $arg) {
+                    if (is_string($arg)) {
+                        $args[] = "'" . $arg . "'";
+                    } elseif (is_array($arg)) {
+                        $args[] = "Array";
+                    } elseif (is_null($arg)) {
+                        $args[] = 'NULL';
+                    } elseif (is_bool($arg)) {
+                        $args[] = ($arg) ? "true" : "false";
+                    } elseif (is_object($arg)) {
+                        $args[] = get_class($arg);
+                    } elseif (is_resource($arg)) {
+                        $args[] = get_resource_type($arg);
+                    } else {
+                        $args[] = $arg;
+                    }
+                }
+                $args = join(", ", $args);
+            }
+            $rtn .= sprintf("#%s %s(%s): %s(%s)\n",
+                    $count,
+                    (isset($frame['file']) ? $frame['file'] : ''),
+                    (isset($frame['line']) ? $frame['file'] : ''),
+                    (isset($frame['function']) ? $frame['function'] : ''),
+                    $args);
+            $count++;
+        }
+        return $rtn;
+    }
+
     class Okay
     {
         const glob = '/{*.inc,*.ok,*/*.ok,*/_ok.php}';
-        
+
         public $dir;
         public $count_files;
         public $count_expectations;
@@ -220,7 +263,12 @@ namespace ok {
         function perform($dir, $method)
         {
             $file = $dir . "/{$method}";
-            include_if_present($file) && DEBUG() && printf("<div class='{$method}'>performed: $file</div>" . BR);
+            if (file_exists($file)) {
+                //$this->protect(function() use( $file, $method ) {
+                include($file);
+                DEBUG() && printf("<div class='{$method}'>performed: $file</div>" . BR);
+                //});
+            }
         }
 
         function test($path)
@@ -261,20 +309,25 @@ namespace ok {
 
         // function protect($callable, ...$args) { // php>=5.6
         function protect($callable)
-        { // php<5.6
+        {
+            DEBUG() && printf("PROTECT\n");
+            // php<5.6
             if (version_compare(PHP_VERSION, '5.4.0') < 0) {
                 $this->previous_error_handler = set_error_handler(array($this, "error_handler"), E_WARNING);
             } else assert_options(ASSERT_WARNING, 0);
 
-            // $this->previous_exception_handler = set_exception_handler(array($this, "exception_handler"));
+            $this->previous_error_handler = set_error_handler(array($this, "error_handler"), E_WARNING);
+            $this->previous_exception_handler = set_exception_handler(array($this, "exception_handler"));
             asserts(true);
 
-            // $result = $callable(...$args); // php>=5.6
             $result = call_user_func_array($callable, array_slice(func_get_args(), 1)); // php<5.6
 
             asserts(false);
-            // restore_exception_handler();
+
+            restore_exception_handler();
             restore_error_handler();
+
+            DEBUG() && printf("PROTECTED\n");
 
             return $result;
         }
@@ -287,7 +340,7 @@ namespace ok {
             printf("<div class = 'suite'>");
 
             $this->perform($dir, '_ok.php');
-            foreach (glob( $dir. Okay::glob  , GLOB_BRACE) as $path) {
+            foreach (glob($dir . Okay::glob, GLOB_BRACE) as $path) {
                 $this->perform($dir, '_setup.php');
 
                 if (substr($path, -3) == 'php') $this->run(dirname($path));
@@ -324,9 +377,16 @@ namespace ok {
 
         function exception_handler($ex)
         {
-
             if ($this->previous_exception_handler == null) {
-                print_r($ex->getTraceAsString());
+
+                //print_r($ex->getTraceAsString());
+                printf(BR);
+                printf("ERROR: " . $ex->getMessage() . BR);
+                printf("IN:    " . $ex->getFile());
+                printf(" (line %d)" . BR, $ex->getLine());
+                printf(BR);
+                printf(getExceptionTraceAsString($ex, 9));
+
                 return null;
             }
             return $this->previous_exception_handler($ex);
