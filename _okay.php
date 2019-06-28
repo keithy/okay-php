@@ -11,41 +11,32 @@ namespace ok;
  * 
  */
 
-
 // Update minor version number on every commit
-$OKAY_VERSION = '0.9.15';
+$OKAY_VERSION = '0.9.19';
 
 // The enclosure of the code within the 'else' clause of this conditional ensures
-// that we do not get function re-definition errors. (Dont be tempted to remove it.)
+// that we do not get function re-definition errors. (i.e. dont be tempted to remove it.)
 if (defined('__OKAY__')) return false;
 else {
+    global $trace_file;
 
     define('__OKAY__', __FILE__);
 
-    if (isset($OKAY_SUITE)) $OKAY_SUITE = realpath($OKAY_SUITE);
-    else { // find the calling file's directory
-        $backtrace = debug_backtrace();
-        $OKAY_SUITE = (empty($backtrace)) ? __DIR__ : dirname($backtrace[0]['file']);
-    }
-
-    // Magic constant to point to the project root. Assumes we are in /vendor/okay/okay
+    // Our magic constant to point to the project root. (assumes we are in /vendor/okay/okay)
     if (!defined('__PROJECT__')) define("__PROJECT__", dirname(dirname(dirname(__DIR__))));
 
-    /*
-     * For web runner security we defer to an externally supplied file - please provide your own!
-     */
+    function log_errors($on, $options = E_ALL)
+    {
+        ini_set('xdebug.collect_params' , 4);
+        ini_set('log_errors', ($on ? 1 : 0));
+        ini_set('display_errors', ($on ? 1 : 0));
+        ini_set('display_startup_errors', ($on ? 1 : 0));
+        error_reporting($options);
+        // if (extension_loaded('xdebug')) xdebug_disable(); // orange not to your taste
+    }
+    log_errors(true, E_ALL);
 
-    if (php_sapi_name() !== 'cli' && !include($_SERVER['DOCUMENT_ROOT'] . '/../config/gateway_okay.inc'))
-            die("HERE");
-
-    // Defaults
-    ini_set('log_errors', 1);
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-
-    // if (extension_loaded('xdebug')) xdebug_disable(); // orange not to your taste
-
+    //utility
     function include_if_present($file)
     {
         if (file_exists($file)) {
@@ -53,28 +44,48 @@ else {
         }
         return false;
     }
-    // Local user can override settings
+    // Local user/codebase can override settings
     include_if_present(__PROJECT__ . '/config/okay.inc');
 
     // But not these settings
     assert_options(ASSERT_WARNING, 0);
     ini_set('assert.exception', 1);
 
-    // SetUp the Runners output
+    // SetUp the runners input/output
     if (php_sapi_name() == 'cli') { // cli runner
+        // Input: find a value for $OKAY_SUITE - the top level directory of this run.
+        if (isset($OKAY_SUITE)) $OKAY_SUITE = realpath($OKAY_SUITE);
+        else { // find the calling file's directory
+            $backtrace = debug_backtrace();
+            $OKAY_SUITE = (empty($backtrace)) ? __DIR__ : dirname($backtrace[0]['file']);
+        }
+
+        if (false !== $pos = array_search('-T', $_SERVER['argv']))
+                $trace_file = $_SERVER['argv'][$pos + 1];
+
+        // Output
         if (!defined('BR')) define('BR', PHP_EOL);
         if (!defined('OKAY_OUTPUT')) define('OKAY_OUTPUT', 'text/plain');
     } else { // web runner
-        // respond in plaintext for now.
+        /* Gateway
+         * For web runner security we defer to an externally supplied file - please provide your own!
+         */
+        if (!include($_SERVER['DOCUMENT_ROOT'] . '/../config/okay_gateway.inc'))
+                die("Local security gateway is not installed");
+
+        $trace_file = filter_input(INPUT_GET, 'trace', FILTER_SANITIZE_STRING);
+
+        // Input
+        if (isset($_GET['ok'])) $OKAY_SUITE = realpath(__PROJECT__ . '/' . $_GET['ok']);
+        if (0 !== strpos($OKAY_SUITE, __PROJECT__)) die('Invalid Path');
+
+        // Output: respond in plaintext for now.
         if (!defined('OKAY_OUTPUT')) define('OKAY_OUTPUT', 'text/plain');
         if (!defined('BR')) define('BR', PHP_EOL);
         // if (!defined('BR')) define('BR', '<BR>');
 
         header("Content-Type: " . OKAY_OUTPUT);
         ini_set('html_errors', 0);
-
-        if (isset($_GET['ok'])) $OKAY_SUITE = realpath(__PROJECT__ . '/' . $_GET['ok']);
-        if (0 !== strpos($OKAY_SUITE, __PROJECT__)) die('Invalid Path');
     }
 
     // ok\DEBUG() && ok\printf("Debug only Output".BR);
@@ -82,11 +93,18 @@ else {
     {
         return in_array('-D', $_SERVER['argv']) || filter_input(INPUT_GET, 'debug', FILTER_VALIDATE_BOOLEAN);
     }
-
+    
+    // xdebug trace support - on - trace('/tmp/trace') & - off - trace(false);
+    function trace($file = false)
+    {
+        if (!$file) return xdebug_stop_trace();
+        xdebug_start_trace($file, XDEBUG_TRACE_APPEND);     
+    }
+    
     // useful for wiping out file fixtures in a directory
     function delete_all_matching($in, $match = '*')
     {
-        assert($in !== '');
+        assert($in !== ''); // more guards needed?
         assert($in !== '/');
         array_map('unlink', glob("{$in}/{$match}"));
     }
@@ -123,7 +141,6 @@ else {
     }
 
     // vocabulary
-
     function _()
     {
         $msg = implode(' ', func_get_args());
@@ -186,7 +203,6 @@ else {
 
     function asserts($on)
     {
-
         if (version_compare(PHP_VERSION, '5.4.0') < 0) {
             assert_options(ASSERT_WARNING, $on);
         } else {
@@ -269,8 +285,7 @@ else {
             $file = $dir . "/{$method}";
             if (file_exists($file)) {
                 DEBUG() && printf("<div class='{$method}'>performing: $file</div>" . BR);
-                //});
-                //$this->protect(function() use( $file, $method ) {
+
                 include($file);
             }
         }
@@ -279,7 +294,7 @@ else {
         {
             $this->assertion_fail_count = 0;
 
-            $result = null; // if error occurred
+            $result = null; // if error occurrs
 
             given($path);
 
@@ -298,14 +313,18 @@ else {
 
         function performTest($path)
         {
-            global $okaying;
+            global $okaying, $trace_file;
 
             $this->count_files++;
 
             //$this->indent(+2);
+            $trace_file && trace($trace_file);
             $okaying = true;
+
             $result = include($path);
+
             $okaying = false;
+            $trace_file && trace(false);
             //$this->indent(-2);
 
             return $result;
@@ -322,10 +341,11 @@ else {
 
             //$this->previous_error_handler = set_error_handler(array($this, "error_handler"), E_WARNING);
             $this->previous_exception_handler = set_exception_handler(array($this, "exception_handler"));
+
             asserts(true);
 
             $result = call_user_func_array($callable, array_slice(func_get_args(), 1)); // php<5.6
-
+ 
             asserts(false);
 
             restore_exception_handler();
@@ -344,6 +364,7 @@ else {
             printf("<div class = 'suite'>");
 
             $this->perform($dir, '_ok.php');
+
             foreach (glob($dir . Okay::glob, GLOB_BRACE) as $path) {
 
                 $this->perform($dir, '_setup.php');
@@ -411,7 +432,7 @@ else {
     $title = "OKAY($OKAY_VERSION):" . $OKAY_SUITE;
 
     if (isPlain()) printf("$title" . BR);
-    else \ok\lookup_and_include('header_okay', $OKAY_SUITE);
+    else lookup_and_include('header_okay', $OKAY_SUITE);
 
     $okay = new Okay();
     $okay->run($OKAY_SUITE);
@@ -424,7 +445,7 @@ else {
 
     if (isPlain())
             printf("Ran %d files (%d expectations) %s" . BR, $count_files, $count_expectations, $failedMsg);
-    else \ok\lookup_and_include('footer_okay', $OKAY_SUITE);
+    else lookup_and_include('footer_okay', $OKAY_SUITE);
 
     return true;
 }

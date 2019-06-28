@@ -70,7 +70,12 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
  php: [5.6,7.1]
  script: php okay/_okay.php -I
  ```
-## Usage
+
+## Usage Composer
+```
+composer require --dev okay/okay 
+```
+## Usage Standalone
 
 1. Copy the `_okay.php` file to somewhere within your project, or to the root of your specs/tests/okay folder.
 
