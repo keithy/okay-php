@@ -12,7 +12,7 @@ namespace ok;
  */
 
 // Update minor version number on every commit
-$OKAY_VERSION = '0.9.19';
+$OKAY_VERSION = '1.0.0';
 
 // The enclosure of the code within the 'else' clause of this conditional ensures
 // that we do not get function re-definition errors. (i.e. dont be tempted to remove it.)
@@ -20,14 +20,31 @@ if (defined('__OKAY__')) return false;
 else {
     global $trace_file;
 
-    define('__OKAY__', __FILE__);
+    define('__OKAY__', __FILE__); // there can be only one
 
-    // Our magic constant to point to the project root. (assumes we are in /vendor/okay/okay)
+    //utility
+    function include_if_present($file)
+    {
+        if (file_exists($file)) return include($file);
+        else return false;
+    }
+    // Local config location (webrunner can override)
+    if (!defined('__OKAY_CONFIG__')) define("__OKAY_CONFIG__", __DIR__ . '/../../config/okay.inc');
+
+    // Local config can override settings, including __PROJECT__, and __GATEWAY__
+    include_if_present(__OKAY_CONFIG__);
+
+    // Magic constant to point to the project root. (assumes we are in /vendor/okay/okay)
     if (!defined('__PROJECT__')) define("__PROJECT__", dirname(dirname(dirname(__DIR__))));
 
+    // Constant to point to the web-runner security gateway (webrunner/config can override)
+    if (!defined('__OKAY_GATEWAY__'))
+            define("__OKAY_GATEWAY__", __PROJECT__ . '/config/okay_gateway.inc');
+
+    // tweak these
     function log_errors($on, $options = E_ALL)
     {
-        ini_set('xdebug.collect_params' , 4);
+        ini_set('xdebug.collect_params', 4);
         ini_set('log_errors', ($on ? 1 : 0));
         ini_set('display_errors', ($on ? 1 : 0));
         ini_set('display_startup_errors', ($on ? 1 : 0));
@@ -36,18 +53,7 @@ else {
     }
     log_errors(true, E_ALL);
 
-    //utility
-    function include_if_present($file)
-    {
-        if (file_exists($file)) {
-            return include($file);
-        }
-        return false;
-    }
-    // Local user/codebase can override settings
-    include_if_present(__PROJECT__ . '/config/okay.inc');
-
-    // But not these settings
+    // But do not tweak these
     assert_options(ASSERT_WARNING, 0);
     ini_set('assert.exception', 1);
 
@@ -60,6 +66,7 @@ else {
             $OKAY_SUITE = (empty($backtrace)) ? __DIR__ : dirname($backtrace[0]['file']);
         }
 
+        // Handle the -T <trace-file> cli parameters
         if (false !== $pos = array_search('-T', $_SERVER['argv']))
                 $trace_file = $_SERVER['argv'][$pos + 1];
 
@@ -70,8 +77,7 @@ else {
         /* Gateway
          * For web runner security we defer to an externally supplied file - please provide your own!
          */
-        if (!include($_SERVER['DOCUMENT_ROOT'] . '/../config/okay_gateway.inc'))
-                die("Local security gateway is not installed");
+        if (!include(__OKAY_GATEWAY__)) die("Local security gateway is not installed");
 
         $trace_file = filter_input(INPUT_GET, 'trace', FILTER_SANITIZE_STRING);
 
@@ -93,14 +99,14 @@ else {
     {
         return in_array('-D', $_SERVER['argv']) || filter_input(INPUT_GET, 'debug', FILTER_VALIDATE_BOOLEAN);
     }
-    
+
     // xdebug trace support - on - trace('/tmp/trace') & - off - trace(false);
     function trace($file = false)
     {
         if (!$file) return xdebug_stop_trace();
-        xdebug_start_trace($file, XDEBUG_TRACE_APPEND);     
+        xdebug_start_trace($file, XDEBUG_TRACE_APPEND);
     }
-    
+
     // useful for wiping out file fixtures in a directory
     function delete_all_matching($in, $match = '*')
     {
@@ -175,6 +181,7 @@ else {
     {
         return _("should", $message);
     }
+    
     /*
      * If code under test may have an endless loop, this utility comes in handy
      * ok\die_after(5);
@@ -345,7 +352,7 @@ else {
             asserts(true);
 
             $result = call_user_func_array($callable, array_slice(func_get_args(), 1)); // php<5.6
- 
+
             asserts(false);
 
             restore_exception_handler();

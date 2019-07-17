@@ -4,7 +4,7 @@
 [![Latest Version](https://img.shields.io/github/release/keithy/okay-php.svg)](https://github.com/keithy/okay-php/releases)
 [![PHP from Travis config](https://img.shields.io/travis/php-v/keithy/okay-php.svg)](https://travis-ci.org/keithy/okay-php)
 
-# OKAY 0.9 -  Keeping It Simple Specifications for PHP
+# OKAY 1.0 -  Keeping It Simple Specifications for PHP
  
 Totally the simplest BDD/TDD framework,... in the world!
  
@@ -12,10 +12,22 @@ Design based on the original SUnit by Kent Beck
   
 A result of another Cunningham-Beck innovation:
 http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
-  
+
+## Example Test/Spec
+```
+namespace ok {
+
+    EXPECT("assertions ini configuration");
+
+    _("to be enabled");
+
+    assert(1 == ini_get('zend.assertions'));
+    assert(0 == ini_get('assert.exception'));   
+}
+``` 
 ## Documentation:
    
-1. `_okay.php` is all of the code (<300 lines), both a command line, and a web test runner (wip)
+1. `_okay.php` is all of the code (<320 lines), both a command line and web test-runner
 
 2. Adding `_ok.php` turns a directory of `*.inc` scripts/directories into a spec/test suite.
    (Edit it manually in order to directly require the `_okay.php` file.) 
@@ -39,16 +51,16 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
   
 6. Zero dependencies
 
-    Does not need a functioning composer/autoload. Will not clutter your cool, lean code-base.
-    Will not frighten your package users by loading lots of stuff, just for testing/require-dev.
-
-7. Excellent basis for "Platform Tests" and White Screen of Death debugging
+    Does not need a functioning composer/autoload, will not clutter a cool, lean code-base.
+    Great for testing smaller bits and pieces (see .travis.yml for the non-trivial self-test example)
+ 
+7. Excellent basis for "Platform Tests", "healthz" style checks, and White Screen of Death debugging
 
     Platform-tests run to verify that the deployment platform, PHP runtime, and Databases and
     other bits and pieces are configured and working as expected.
  
     When faced with the PHP - W.S.O.D. and no clues, a platform test/spec suite can check for common
-    misconfiguration scenarios and tell you what is working. 
+    miss-configuration scenarios and tell you what is working. 
  
 8. Compare Runs - see only the differences
 
@@ -75,6 +87,7 @@ http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
 ```
 composer require --dev okay/okay 
 ```
+
 ## Usage Standalone
 
 1. Copy the `_okay.php` file to somewhere within your project, or to the root of your specs/tests/okay folder.
@@ -82,6 +95,10 @@ composer require --dev okay/okay
 2. Copy the `_ok.php` file to the root of any other specs/tests folder within your project.
    (edit it so that it can find _okay.php)
 
+## Web Runner
+
+Copy `public/okay.php`to somewhere on your site, and copy `config/gateway_okay.inc`
+cd 
 ## Example Output
 Nothing fancy
 
