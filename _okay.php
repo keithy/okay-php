@@ -12,12 +12,13 @@ namespace ok;
  */
 
 // Update minor version number on every commit
-$OKAY_VERSION = '1.0.1';
+$OKAY_VERSION = '1.0.2';
 
 // Some of the ways that _okay.php may be called can dodge around the 'require_once' mechanism.
 // Therefore to be on the safe side we roll our own.
 // The enclosure of the code within the 'else' clause of this conditional switches PHP to use
 // sequential declaration to avoid function re-definition errors. (i.e. dont be tempted to remove it.)
+
 if (defined('__OKAY__')) return false;
 else {
     global $trace_file;
@@ -34,7 +35,7 @@ else {
     // Local config location (webrunner can override)
     if (!defined('OKAY_CONFIG')) define("OKAY_CONFIG", __DIR__ . '/../../config/okay.inc');
 
-    // Local config can override settings, including __PROJECT__, and __GATEWAY__
+    // Local config can override settings, including __PROJECT__, and OKAY_GSTEWAY
     include_if_present(OKAY_CONFIG);
 
     // Magic constant to point to the project root. (assumes we are in /vendor/okay/okay)
@@ -177,10 +178,15 @@ else {
         return call_user_func_array("ok\__", $args);
     }
 
-    function Should($message)
+    // $okay = ok\test("expectation...")
+    function TEST()
     {
-        return _("should", $message);
+        $args = func_get_args();
+        array_unshift($args, "Test");
+        return call_user_func_array("ok\__", $args);
     }
+
+    function Should($message) { return _("should", $message); }
     
     /*
      * If code under test may have an endless loop, this utility comes in handy
@@ -299,7 +305,7 @@ else {
 
         function test($path)
         {
-            $this->assertion_fail_count = 0;
+            $failed = $this->count_failed_assertions;
 
             $result = null; // if error occurrs
 
@@ -309,7 +315,7 @@ else {
 
             $result = $this->protect(array($this, "performTest"), $path);
 
-            if ($this->count_failed_assertions > 0 && $result == true) {
+            if ($this->count_failed_assertions > $failed && $result == true) {
                 $result = false;
             }
 
@@ -436,7 +442,7 @@ else {
 
     // Output
 
-    $title = "OKAY($OKAY_VERSION):" . $OKAY_SUITE;
+    $title = "OKAY(VERSION $OKAY_VERSION):" . $OKAY_SUITE;
 
     if (isPlain()) printf("$title" . BR);
     else lookup_and_include('header_okay', $OKAY_SUITE);

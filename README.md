@@ -5,7 +5,7 @@
 [![PHP from Travis config](https://img.shields.io/travis/php-v/keithy/okay-php.svg)](https://travis-ci.org/keithy/okay-php)
 
 # OKAY 1.0 -  Keeping It Simple Specifications for PHP
- 
+
 Totally the simplest BDD/TDD framework,... in the world!
  
 Design based on the original SUnit by Kent Beck
@@ -13,26 +13,34 @@ Design based on the original SUnit by Kent Beck
 A result of another Cunningham-Beck innovation:
 http://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork
 
-## Example Test/Spec
+## Example Test/Spec/Okays
+
+* Tests - TDD
+* Specs - BDD vocabulary
+* Okays - Our name for platform tests
 ```
 namespace ok {
 
     EXPECT("assertions ini configuration");
 
     _("to be enabled");
-
+    
+    // Of course assertions will not work for these checks if they are not turned on!
     assert(1 == ini_get('zend.assertions'));
-    assert(0 == ini_get('assert.exception'));   
+    assert(0 == ini_get('assert.exception'));
+
+    if (1 != ini_get('zend.assertions') then
 }
 ``` 
 ## Documentation:
    
 1. `_okay.php` is all of the code (<320 lines), both a command line and web test-runner
 
-2. Adding `_ok.php` turns a directory of `*.inc` scripts/directories into a spec/test suite.
-   (Edit it manually in order to directly require the `_okay.php` file.) 
+2. Adding `_ok.php` to a directory of `*.inc` scripts/directories turns them
+    into a spec/test suite.
+    (edit it to have the correct path to invoke `_okay.php`)
 
- `_ok.php` also provides one-time run_setup code for specs/tests/okays in that directory.
+    Each `_ok.php` can be modified to provide any one-time run_setup code for specs defined in that directory.
 
 3. BDD style "english" output.
     ```
@@ -46,8 +54,8 @@ namespace ok {
 
 5. Use throughout your codebase, deployment optional
 
-   Great for adding specs/tests to a file-based "legacy" PHP system.
-   (adjust your deployment to ignore/delete `_*` files, and it's gone.)
+    Great for adding specs/tests to a file-based "legacy" PHP system.
+    (adjust your deployment to ignore/delete `_*` files, and it's gone.)
   
 6. Zero dependencies
 
@@ -76,7 +84,18 @@ namespace ok {
     ```
     watch -n3  'php _okay.php | diff -U5 .out -' 
     ```
-10. Works great with travis.ci in github
+
+10. Works great with github actions
+
+ ```
+ jobs:
+  build:
+    runs-on: ubuntu-latest
+    - name: Run okay test suite
+      run: php _okay.php
+ ```
+
+11. Works great with travis.ci 
  ```
  language: php
  php: [5.6,7.1]
@@ -93,17 +112,18 @@ composer require --dev okay/okay
 1. Copy the `_okay.php` file to somewhere within your project, or to the root of your specs/tests/okay folder.
 
 2. Copy the `_ok.php` file to the root of any other specs/tests folder within your project.
-   (edit it so that it can find _okay.php)
+   (edit it to have the correct path to invoke `_okay.php`)
 
 ## Web Runner
 
 Copy `public/okay.php`to somewhere on your site, and copy `config/gateway_okay.inc`
-cd 
+(edit it to have the correct path to invoke `_okay.php`)
+
 ## Example Output
 Nothing fancy
 
 ```
-OKAY(0.8):/home/travis/build/keithy/okay-php
+OKAY(VERSION 1.0.2):/home/travis/build/keithy/okay-php
 
 Given okay spec file returns true or false
  1) Expect returning true to be a pass and to look like this
@@ -138,9 +158,4 @@ FAILED(14): assert failed AS EXPECTED
       should be ignored
 Ran 6 files (12 expectations) failed 2 assertions
 ```
-
-#### To Do
-
-Beautify the runners.
-Make based runner - runs tests in independent php processes!
 

@@ -1,5 +1,8 @@
 <?php
 
+// WIRING is our pattern for dynamic switching of config
+// The wiring entry point sets __SITE__ so we check this
+
 global $WIRING;
 
 assert(__SITE__ == $_SERVER['DOCUMENT_ROOT']);

@@ -1,4 +1,5 @@
-Given okay provides function copy_all_matching to prepare fixtures
+
+Given okay okay provides function copy_all_matching to prepare fixtures
  1) Expect fixture directory to be empty
  2) Expect copy_all files from snapshot to populate fixture directory
  3) Expect delete files matching *.inc
@@ -6,24 +7,29 @@ Given okay provides function copy_all_matching to prepare fixtures
  4) Expect delete files matching *.php
       should leave directory empty
 
-Given okay provides function lookup_and_include to look for needle
+Given okay okay provides function lookup_and_include to look for needle
  5) Expect to find needle in same directory
  6) Expect to find needle via parent directory
 
-Given okay provides function lookup_and_include when looking for non existent file
+Given okay okay provides function lookup_and_include when looking for non existent file
  7) Expect it to return false
 
-Given okay provides assertions when they fail
+Given okay okay provides assertions when they fail
  8) Expect assertion failure
       to look like this
  8} FAILED(11): assert failed AS EXPECTED
  9) Expect spec file return value
       should be ignored
 
-Given okay provides assertions when they pass
+Given okay okay provides assertions when they pass
 10) Expect assertion failure
       to look like this
 10} FAILED(11): assert failed AS EXPECTED
 11) Expect spec file return value
       should be ignored
-Ran 5 files (11 expectations) failed 2 assertions
+
+Given okay okay requires assertion exceptions
+12) Expect assertions ini configuration
+      to be enabled
+      using assert callbacks (within okay specs)
+Ran 6 files (12 expectations) failed 2 assertions

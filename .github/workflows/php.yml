@@ -1,4 +1,4 @@
-name: PHP Composer
+name: Okay self test
 
 on:
   push:
@@ -10,15 +10,60 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  tests:
+    name: Tests
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    env:
+      PHP_INI_VALUES: assert.exception=0, memory_limit=-1, zend.assertions=1
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+#          - windows-latest
+
+        php-version:
+#          - "8.0"
+          - "8.2"
+
+        compiler:
+          - default
+
+        include:
+          - os: ubuntu-latest
+            php-version: "8.0"
+            compiler: jit
+
+          - os: ubuntu-latest
+            php-version: "8.1"
+            compiler: jit
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Configure git to avoid issues with line endings
+        if: matrix.os == 'windows-latest'
+        run: git config --global core.autocrlf false
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    # - name: Run test suite
-    #   run: composer run-script expected
+      - name: Override PHP ini values for JIT compiler
+        if: matrix.compiler == 'jit'
+        run: echo "PHP_INI_VALUES::assert.exception=0, memory_limit=-1, zend.assertions=1, opcache.enable=1, opcache.enable_cli=1, opcache.optimization_level=-1, opcache.jit=1255, opcache.jit_buffer_size=32M" >> $GITHUB_ENV
+
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          ini-values: ${{ env.PHP_INI_VALUES }}
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Run okay test suite
+        run: php _okay.php || true
+
+      - name: Regression
+        run: composer run-script expected
