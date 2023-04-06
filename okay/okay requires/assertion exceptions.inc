@@ -5,6 +5,12 @@ namespace ok {
     // Uncomment temporarily to test that the following tests catch the problem
     // ini_set('zend.assertions', 0);
 
+    // verify these settings for > 5.4
+    if (version_compare(PHP_VERSION, '5.4.0') < 0) {
+        printf("      Assuming Correct for php < 5.4\n");
+        return;
+    }
+
     $FAIL = 0;
 
     EXPECT("assertions ini configuration");
@@ -13,11 +19,14 @@ namespace ok {
 
     // If assert is disabled we cant use assert to check!
 
-    assert(1 == ini_get('zend.assertions')   );
+    if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
+       
+        assert( 1 == ini_get('zend.assertions') );
 
-    if (1 != ini_get('zend.assertions')) {
-        ++$FAIL;
-        printf("      ASSERTIONS NOT ENABLED CORRECTLY zend.assertions != 1\n");
+        if (1 != ini_get('zend.assertions')) {
+            ++$FAIL;
+            printf("      ASSERTIONS NOT ENABLED CORRECTLY zend.assertions != 1\n");
+        }
     }
 
     _("using assert callbacks (within okay specs)");

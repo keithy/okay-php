@@ -12,7 +12,7 @@ namespace ok;
  */
 
 // Update minor version number on every commit
-$OKAY_VERSION = '1.0.2';
+$OKAY_VERSION = '1.0.3';
 
 // Some of the ways that _okay.php may be called can dodge around the 'require_once' mechanism.
 // Therefore to be on the safe side we roll our own.
@@ -431,7 +431,7 @@ else {
             return $this->previous_exception_handler($ex);
         }
 
-        function on_assertion_failure($file, $line, $code, $msg)
+        function on_assertion_failure($file, $line, $code, $msg = '')
         {
             if (version_compare(PHP_VERSION, '5.4.0') >= 0) { // Handling Callback php>=5.4
                 ++$this->count_failed_assertions;

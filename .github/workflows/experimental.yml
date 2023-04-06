@@ -1,3 +1,6 @@
+# Inspiration
+# https://github.com/sebastianbergmann/phpunit/blob/main/.github/workflows/ci.yml
+
 name: Okay self test
 
 on:
@@ -22,26 +25,27 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
-#          - windows-latest
+#          - ubuntu-latest
+          - windows-latest
 
         php-version:
-#          - "8.0"
-          - "8.2"
+          - "8.1"
+          # - "8.2"
+          # - "5.3"
+          # - "5.4"
+          # - "5.5"
+          # - "7.1"
+          # - "7.4"
 
         compiler:
           - default
 
-        include:
-          - os: ubuntu-latest
-            php-version: "8.0"
-            compiler: jit
-
-          - os: ubuntu-latest
-            php-version: "8.1"
-            compiler: jit
+    defaults:
+      run:
+        shell: bash
 
     steps:
+
       - name: Configure git to avoid issues with line endings
         if: matrix.os == 'windows-latest'
         run: git config --global core.autocrlf false
@@ -65,5 +69,24 @@ jobs:
       - name: Run okay test suite
         run: php _okay.php || true
 
+      - name: PHP5.x Different output
+        if: startsWith(matrix.php-version, '5.')
+        run: |
+          echo "EXPECTED=expected5" >> $GITHUB_ENV
+
+      - name: PHP5.3 Different output
+        if: matrix.php-version == '5.3'
+        run: |
+          echo "EXPECTED=expected5.3" >> $GITHUB_ENV
+
+      - name: ls
+        run: ls -l
+
+      - name: find
+        run: find .
+
+      - name: vars
+        run: echo $EXPECTED
+
       - name: Regression
-        run: composer run-script expected
+        run: composer run-script regression

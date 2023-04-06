@@ -22,6 +22,6 @@
   },
   "scripts": {
     "test": "php _okay.php",
-    "expected": "php _okay.php | grep -v VERSION | diff -bwB \".github/outputs/expected${VERS}\" -"
+    "regression": "php _okay.php | grep -v VERSION | diff -bwB \".github/regression/${EXPECTED:-expected}\" -"
   }
 }
