@@ -25,11 +25,9 @@ namespace ok {
 
     _("to be enabled");
     
-    // Of course assertions will not work for these checks if they are not turned on!
     assert(1 == ini_get('zend.assertions'));
     assert(0 == ini_get('assert.exception'));
 
-    if (1 != ini_get('zend.assertions') then
 }
 ``` 
 ## Documentation:
