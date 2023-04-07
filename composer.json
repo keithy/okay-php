@@ -1,8 +1,8 @@
 {
   "name": "okay/okay",
   "type": "library",
-  "description": "Ultra Simple Specifications/Tests for PHP",
-  "keywords": ["testing", "unit-tests", "platform-tests", "platform-specs", "specs", "BDD", "TDD"],
+  "description": "Ultra Simple Specs/Tests for PHP all versions >= 5.3",
+  "keywords": ["testing", "unit-tests", "platform-tests", "platform-specs", "specs", "tests", "BDD", "TDD"],
   "homepage": "https://github.com/keithy/okay-php",
   "license": "MIT",
   "authors": [
@@ -22,7 +22,7 @@
   "autoload-dev": {
   },
   "scripts": {
-    "test": "php _okay.php",
-    "regression": "bash -c 'php _okay.php | grep -v VERSION | diff -bwB \".github/regression/${EXPECTED:-expected}\" -'"
+    "test": "php _okay.php -I",
+    "regression": "bash -c 'php _okay.php -I | grep -v VERSION | diff -bwB \".github/regression/${EXPECTED:-expected}\" -'"
   }
 }
