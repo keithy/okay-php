@@ -12,7 +12,7 @@ namespace ok;
  */
 
 // Update minor version number on every commit
-$OKAY_VERSION = '1.0.5';
+$OKAY_VERSION = '1.0.6';
 
 // Some of the ways that _okay.php may be called can dodge around the 'require_once' mechanism.
 // Therefore to be on the safe side we roll our own.
