@@ -1,10 +1,10 @@
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
-[![Tests Status](https://github.com/keithy/okay-php/actions/workflows/php.yml/badge.svg)](https://github.com/keithy/okay-php/actions?query=workflow%3Aphp.yml)
+[![Tests Status](https://github.com/keithy/okay-php/actions/workflows/php.yml/badge.svg)](https://github.com/keithy/okay-php/actions)
 [![GitHub issues](https://img.shields.io/github/issues/keithy/okay-php.svg)](https://github.com/keithy/okay-php/issues)
 [![Awesome](https://img.shields.io/badge/awesome%3F-yes!-brightgreen.svg)](https://packagist.org/packages/okay/okay)
 [![Latest Version](https://img.shields.io/github/release/keithy/okay-php.svg)](https://github.com/keithy/okay-php/releases)
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/okay/okay.svg?maxAge=3600)](https://packagist.org/packages/okay/okay)
-[![Tested on PHP 5.3 to 8.2](https://img.shields.io/badge/tested%20on-PHP%205.3%20|%205.4%20|%205.5%20|%205.6%20|%207.1%20|%207.4%20|%208.1%20|%208.2%20-brightgreen.svg?maxAge=2419200)](https://github.com/keithy/okay-php/actions?query=workflow%3Aphp.yml)
+[![Tested on PHP 5.3 to 8.2](https://img.shields.io/badge/tested%20on-PHP%205.3%20|%205.4%20|%205.5%20|%205.6%20|%207.1%20|%207.4%20|%208.1%20|%208.2%20-brightgreen.svg?maxAge=2419200)](https://github.com/keithy/okay-php/actions)
 
 
 # OKAY 1.0 -  Keeping It Simple Specifications for PHP
